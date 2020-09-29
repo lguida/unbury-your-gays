@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Unbury Your Gays: Suggestion Box</title>
+    <link rel="stylesheet" href="main.css">
+</head>
+
+<body>
+    <header>
+      <nav>
+        <ul id="menu">
+          <li><a href="index.html">Browse</a></li>
+          <li><a href="search.html">Search</a></li>
+          <li><a href="suggestion.html">Suggestion Box</a></li>
+        </ul>
+      </nav>
+    </header>
+
+
+    <main>
+        <form action="https://formspree.io/lguida120@gmail.com" method="post">
+            <label for="user-name">What is the title of your suggestion?</label>
+            <input id="user-name" type="text" name="name">
+            <br>
+            <label for="user-email">What format is it in? (i.e. Movie, TV show, YouTube, etc.)</label>
+            <input id="user-email" type="text" name="email">
+            <br>
+            <label for="user-message">Write me a message about it!</label>
+            <textarea id="user-message" name="message"></textarea>
+            <br>
+            <button type="submit">Send</button>
+
+          </form>
+    </main>
+
+
+    <script src="https://code.jquery.com/jquery-3.3.1.js" integrity="sha256-2Kok7MbOyxpgUVvAk/HJ2jigOSYS2auK4Pfzbm7uH60=" crossorigin="anonymous"></script>
+    <script src="index.js"></script>
+</body>
+</html>
