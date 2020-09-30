@@ -20,8 +20,26 @@
 
 
     <main>
+        <section class="search">
+            <form id="search-form">
+                <input id="search-bar" name="search" type="text">
+                <button class="js-search-button" type="submit">Search</button>
+            </form>
+            <br>
+            <button class="js-advSearch">Advanced Search</button>
+            <form id="advSearchForm" class="hidden">
+                <label for='genre'>Genre:</label>
+                <input id="genre" name="adv-search" type="text">
+                <br>
+                <label for='language'>Language:</label>
+                <input id="language" name="adv-search" type="text">
+                <br>
+                <label for='country'>Country:</label>
+                <input id="country" name="adv-search" type="text">
+            </form>
+        </section>
         <section class="results hidden">
-            <ul>
+            <ul class='results-list'>
                 <!--Display Option 2-->
                 <li class="result-entry group">
                     <div class="item-double">
@@ -39,6 +57,7 @@
 
 
     <script src="https://code.jquery.com/jquery-3.3.1.js" integrity="sha256-2Kok7MbOyxpgUVvAk/HJ2jigOSYS2auK4Pfzbm7uH60=" crossorigin="anonymous"></script>
-    <script src="index.js"></script>
+    <script src="list.js"></script>
+    <script src="main.js"></script>
 </body>
 </html>

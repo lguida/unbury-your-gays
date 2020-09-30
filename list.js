@@ -78,7 +78,7 @@ const store = {
         triggers: ['none']
       },
       {
-        title: 'Professor Marsten and the Wonder Women',
+        title: 'Professor Marsten and  Wonder Women',//fix
         format: 'movie',
         ending: 'Happy',
         occasions: [],
@@ -330,7 +330,7 @@ const store = {
         triggers: ['none']
       },
       {
-        title: 'Orange Is The New Black',
+        title: 'Orange Is the New Black',
         format: 'tv-show',
         ending: 'Neutral',
         occasions: [],
