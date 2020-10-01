@@ -6,7 +6,7 @@ const apiKey = "3324330d7274c224e88ee5dbc2a0b10b"
 let i = 0
 let titlesToSearch = []
 let browseArrayItems = []
-let browseArrayNotDisplayed = store.media
+let browseArrayNotDisplayed = store.media.slice()
 let imageUrlSuffix = ''
 
 
