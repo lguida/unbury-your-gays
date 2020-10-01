@@ -16,6 +16,10 @@ const queryParams = {
     query: ''
 }
 
+const otherVars = {
+    loadIndvPage: false,
+}
+
 //----------HTML Template Functions----------//
 
 
@@ -42,7 +46,7 @@ function renderResults(responseJson){
         $('ul.results-list').append(`
         <li class="result-entry group">
             <div class="item">
-                <a href="">${responseJson.results[0].original_title}</a>
+                <a href='javascript:handleTitleClick("${responseJson.results[0].original_title}")' class='js-indv-link'>${responseJson.results[0].original_title}</a>
                 <br>
                 <p>${responseJson.results[0].overview}</p>
             </div>
@@ -55,7 +59,7 @@ function renderResults(responseJson){
         $('ul.results-list').append(`
         <li class="result-entry group">
             <div class="item">
-                <a href="">${responseJson.results[0].original_name}</a>
+                <a href='javascript:handleTitleClick("${responseJson.results[0].original_name}")' class="js-indv-link">${responseJson.results[0].original_name}</a>
                 <br>
                 <p>${responseJson.results[0].overview}</p>
             </div>
@@ -66,6 +70,46 @@ function renderResults(responseJson){
     }
 
 }
+
+function renderIndvPage(responseJson){
+    console.log("renderIndvPage run")
+    imageUrlSuffix = responseJson.results[0].backdrop_path
+    if (imageUrlSuffix === null){
+        imageUrlSuffix = responseJson.results[0].poster_path
+    }
+    if (responseJson.results[0].media_type == 'movie'){
+        $('ul.results-list').replaceWith(`
+        <div>
+            <h2>${responseJson.results[0].original_title}</h2>
+            <img src="${imageSearchUrl + 'w780' + imageUrlSuffix}" alt="Placeholder Image">
+            <br>
+            <p>${responseJson.results[0].overview}</p>
+        </div>`)
+    }
+    else{
+        $('ul.results-list').replaceWith(`
+        <div>
+            <h2>${responseJson.results[0].original_name}</h2>
+            <img src="${imageSearchUrl + 'w780' + imageUrlSuffix}" alt="Placeholder Image">
+            <br>
+            <p>${responseJson.results[0].overview}</p>
+        </div>`)
+    }
+}
+
+function whichPageToRender(responseJson){
+    if (otherVars.loadIndvPage){
+        renderIndvPage(responseJson)
+        console.log(responseJson)
+        console.log(otherVars.loadIndvPage)
+    }
+    else{
+        renderResults(responseJson) 
+        console.log(responseJson)
+        console.log(otherVars.loadIndvPage)
+    }
+}
+
 
 //----------Search Functions----------//
 
@@ -78,6 +122,7 @@ function formatQueryParams(){
 
 function fetchInfo(items,searchUrl) {
     console.log('fetchInfo run');
+    console.log(items)
     for (i=0; i < items.length; i++){
         queryParams.query = items[i].title
         var queryString = formatQueryParams()
@@ -85,18 +130,20 @@ function fetchInfo(items,searchUrl) {
         fetch(url)
         .then(response => response.json())
         .then(responseJson => 
-            renderResults(responseJson))
+            whichPageToRender(responseJson))
         .catch(error => console.log("Couldn't find "+ items[i] + " in database")); //here lets eventually make it call a function that searches in an alternate database (one that I'll make probably) to see if that works before writing to the console that it can't find it.
     }
 }
 
 function findTitleInStore(title){
-    titlesToSearch = []
+    titlesToSearch = [] 
+    console.log(title,": in find titlein store")
     for (i=0; i < store.media.length; i++){
         if (store.media[i].title.toLowerCase().includes(title.toLowerCase())){
             titlesToSearch.push(store.media[i])
         }
     }
+    console.log(titlesToSearch,": in find titlein store")
     return titlesToSearch
 }
 
@@ -136,8 +183,14 @@ function handleAdvSearchClick(){
     });
 }
 
-function handleTitleClick(){
-
+function handleTitleClick(title){
+    console.log('handleTitleClick run')
+    console.log(title)
+    $('ul.results-list').empty()
+    titlesToSearch = findTitleInStore(title)
+    console.log(titlesToSearch)
+    otherVars.loadIndvPage = true
+    fetchInfo(titlesToSearch, movieSearchUrl)
 }
 
 
