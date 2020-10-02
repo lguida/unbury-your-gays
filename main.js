@@ -2,7 +2,10 @@
 
 const movieSearchUrl = "https://api.themoviedb.org/3/search/multi?"
 const imageSearchUrl = "http://image.tmdb.org/t/p/"
+const youTubeInfoSearchUrl = "https://www.googleapis.com/youtube/v3/search?"
+const youTubeEmbedUrl = "https://www.youtube.com/embed/"
 const apiKey = "3324330d7274c224e88ee5dbc2a0b10b"
+const apiKeyGoogle = "AIzaSyCQd6wTexIF0NbJw4PDsfTdJCnBFNa6E-w"
 let i = 0
 let titlesToSearch = []
 let browseArrayItems = []
@@ -11,21 +14,29 @@ let imageUrlSuffix = ''
 
 
 const queryParams = {
-    api_key: apiKey,
-    //language: 'en-US',
-    query: ''
+    tmdb:{
+        api_key: apiKey,
+        //language: 'en-US',
+        query: ''},
+    youTube:{
+        key: apiKeyGoogle,
+        part: "snippet",
+        maxResults: 10,
+        q: ''
+    }
 }
 
 const otherVars = {
     loadIndvPage: false,
+    youTubeID: ''
 }
 
 //----------HTML Template Functions----------//
 
 
 //ToDO:
-//Display individual movie pages
 //Add YouTube API for trailers
+//make it possible to search using the advanced search parameters
 //make sure suggestion box works
 
 //add in other info on search page
@@ -37,7 +48,7 @@ const otherVars = {
 //----------Render Functions----------//
 
 function renderResults(responseJson){
-    console.log("renderResult run")
+    console.log("renderResults run 4.1")
     imageUrlSuffix = responseJson.results[0].backdrop_path
     if (imageUrlSuffix === null){
         imageUrlSuffix = responseJson.results[0].poster_path
@@ -72,7 +83,7 @@ function renderResults(responseJson){
 }
 
 function renderIndvPage(responseJson){
-    console.log("renderIndvPage run")
+    console.log("renderIndvPage run 4.2")
     imageUrlSuffix = responseJson.results[0].backdrop_path
     if (imageUrlSuffix === null){
         imageUrlSuffix = responseJson.results[0].poster_path
@@ -81,7 +92,7 @@ function renderIndvPage(responseJson){
         $('ul.results-list').replaceWith(`
         <div>
             <h2>${responseJson.results[0].original_title}</h2>
-            <img src="${imageSearchUrl + 'w780' + imageUrlSuffix}" alt="Placeholder Image">
+            <iframe width="560" height="315" src="${youTubeEmbedUrl}${otherVars.youTubeID}" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
             <br>
             <p>${responseJson.results[0].overview}</p>
         </div>`)
@@ -90,7 +101,7 @@ function renderIndvPage(responseJson){
         $('ul.results-list').replaceWith(`
         <div>
             <h2>${responseJson.results[0].original_name}</h2>
-            <img src="${imageSearchUrl + 'w780' + imageUrlSuffix}" alt="Placeholder Image">
+            <iframe width="560" height="315" src="${youTubeEmbedUrl}${otherVars.youTubeID}" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
             <br>
             <p>${responseJson.results[0].overview}</p>
         </div>`)
@@ -98,34 +109,34 @@ function renderIndvPage(responseJson){
 }
 
 function whichPageToRender(responseJson){
+    console.log("whichPageToRender run 3")
     if (otherVars.loadIndvPage){
         renderIndvPage(responseJson)
-        console.log(responseJson)
-        console.log(otherVars.loadIndvPage)
+        console.log(otherVars.youTubeID)
     }
     else{
         renderResults(responseJson) 
-        console.log(responseJson)
-        console.log(otherVars.loadIndvPage)
     }
 }
 
 
 //----------Search Functions----------//
 
-function formatQueryParams(){
-    const queryItems = Object.keys(queryParams)
-    .map(key => `${encodeURIComponent(key)}=${encodeURIComponent(queryParams[key])}`)
+//---TMBD-----//
+
+function formatQueryParams(queryArray){
+    const queryItems = Object.keys(queryArray)
+    .map(key => `${encodeURIComponent(key)}=${encodeURIComponent(queryArray[key])}`)
   return queryItems.join('&');
 }
 
 
-function fetchInfo(items,searchUrl) {
-    console.log('fetchInfo run');
+function fetchInfoTMBD(items,searchUrl) {
+    console.log('fetchInfotmdb run2');
     console.log(items)
     for (i=0; i < items.length; i++){
-        queryParams.query = items[i].title
-        var queryString = formatQueryParams()
+        queryParams.tmdb.query = items[i].title
+        var queryString = formatQueryParams(queryParams.tmdb)
         var url = searchUrl + queryString
         fetch(url)
         .then(response => response.json())
@@ -134,6 +145,29 @@ function fetchInfo(items,searchUrl) {
         .catch(error => console.log("Couldn't find "+ items[i] + " in database")); //here lets eventually make it call a function that searches in an alternate database (one that I'll make probably) to see if that works before writing to the console that it can't find it.
     }
 }
+ 
+//---YouTube-----//
+function saveYouTubeId(responseJson){
+    console.log('saveYouTubeId run 7')
+    console.log(responseJson)
+    otherVars.youTubeID = responseJson.items[0].id.videoId
+}
+
+
+function fetchInfoYouTube(title,searchUrl) {
+    console.log('fetchInfoYouTube run 6');
+    console.log(title)
+    queryParams.youTube.q = title + " official trailer"
+    var queryString = formatQueryParams(queryParams.youTube)
+    var url = searchUrl + queryString
+    fetch(url)
+    .then(resp => resp.json())
+    .then(respJson => 
+        saveYouTubeId(respJson))
+    .catch(error => console.log("Couldn't find "+ items[i] + " in database")); //here lets eventually make it call a function that searches in an alternate database (one that I'll make probably) to see if that works before writing to the console that it can't find it.
+}
+
+ //---LG store-----//
 
 function findTitleInStore(title){
     titlesToSearch = [] 
@@ -150,6 +184,7 @@ function findTitleInStore(title){
 //----------Loading Browse Window Functions----------//
 
 function loadBrowse(){
+    console.log("loadBrowse run 1")
     $('ul.results-list').empty()
     $('.results').removeClass('hidden')
     for (i=0; i < 10; i++){
@@ -157,22 +192,23 @@ function loadBrowse(){
     }
     console.log(browseArrayItems)
     console.log(browseArrayNotDisplayed.length)
-    fetchInfo(browseArrayItems,movieSearchUrl)
+    fetchInfoTMBD(browseArrayItems,movieSearchUrl)
 }
 
 
 //----------Handle Clicks Functions----------//
 
 function handleSearchClick(){
-    console.log("handleSearchClick run")
+    console.log("handleSearchClick run 5")
     $('#search-form').submit(event => {
         event.preventDefault()
+        otherVars.loadIndvPage = false
         $('ul.results-list').empty()
         $('.results').removeClass('hidden')
-        queryParams.query = $(event.currentTarget).find('#search-bar').val()
-        titlesToSearch = findTitleInStore(queryParams.query)
+        queryParams.tmdb.query = $(event.currentTarget).find('#search-bar').val()
+        titlesToSearch = findTitleInStore(queryParams.tmdb.query)
         console.log(titlesToSearch)
-        fetchInfo(titlesToSearch, movieSearchUrl)
+        fetchInfoTMBD(titlesToSearch, movieSearchUrl)
     });
 }
 
@@ -184,13 +220,15 @@ function handleAdvSearchClick(){
 }
 
 function handleTitleClick(title){
-    console.log('handleTitleClick run')
+    console.log('handleTitleClick run 5')
     console.log(title)
     $('ul.results-list').empty()
     titlesToSearch = findTitleInStore(title)
     console.log(titlesToSearch)
+    fetchInfoYouTube(titlesToSearch[0].title, youTubeInfoSearchUrl)
+    console.log(otherVars.youTubeID)
     otherVars.loadIndvPage = true
-    fetchInfo(titlesToSearch, movieSearchUrl)
+    fetchInfoTMBD(titlesToSearch, movieSearchUrl)
 }
 
 
