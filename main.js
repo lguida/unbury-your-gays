@@ -84,6 +84,7 @@ function renderResults(responseJson){
 
 function renderIndvPage(responseJson){
     console.log("renderIndvPage run 4.2")
+    console.log('rendering ', responseJson)
     imageUrlSuffix = responseJson.results[0].backdrop_path
     if (imageUrlSuffix === null){
         imageUrlSuffix = responseJson.results[0].poster_path
@@ -113,6 +114,7 @@ function whichPageToRender(responseJson){
     if (otherVars.loadIndvPage){
         renderIndvPage(responseJson)
         console.log(otherVars.youTubeID)
+        console.log(responseJson)
     }
     else{
         renderResults(responseJson) 
@@ -133,10 +135,17 @@ function formatQueryParams(queryArray){
 
 function fetchInfoTMBD(items,searchUrl) {
     console.log('fetchInfotmdb run2');
-    console.log(items)
+    console.log('fetching in tmdb',items)
     for (i=0; i < items.length; i++){
-        queryParams.tmdb.query = items[i].title
+        console.log(items)
+        if (items[i].title === undefined){
+            queryParams.tmdb.query = items[i]
+        }
+        else{
+            queryParams.tmdb.query = items[i].title
+        }
         var queryString = formatQueryParams(queryParams.tmdb)
+        console.log(queryString)
         var url = searchUrl + queryString
         fetch(url)
         .then(response => response.json())
@@ -151,6 +160,9 @@ function saveYouTubeId(responseJson){
     console.log('saveYouTubeId run 7')
     console.log(responseJson)
     otherVars.youTubeID = responseJson.items[0].id.videoId
+    var title = [queryParams.youTube.q.replace(" official trailer", '')]
+    console.log (title)
+    fetchInfoTMBD(title, movieSearchUrl)
 }
 
 
@@ -161,10 +173,10 @@ function fetchInfoYouTube(title,searchUrl) {
     var queryString = formatQueryParams(queryParams.youTube)
     var url = searchUrl + queryString
     fetch(url)
-    .then(resp => resp.json())
-    .then(respJson => 
-        saveYouTubeId(respJson))
-    .catch(error => console.log("Couldn't find "+ items[i] + " in database")); //here lets eventually make it call a function that searches in an alternate database (one that I'll make probably) to see if that works before writing to the console that it can't find it.
+    .then(response => response.json())
+    .then(responseJson => 
+        saveYouTubeId(responseJson))
+    //.catch(error => console.log("something went wrong"))//"Couldn't find "+ items[i] + " in database")); //here lets eventually make it call a function that searches in an alternate database (one that I'll make probably) to see if that works before writing to the console that it can't find it.
 }
 
  //---LG store-----//
@@ -228,7 +240,7 @@ function handleTitleClick(title){
     fetchInfoYouTube(titlesToSearch[0].title, youTubeInfoSearchUrl)
     console.log(otherVars.youTubeID)
     otherVars.loadIndvPage = true
-    fetchInfoTMBD(titlesToSearch, movieSearchUrl)
+    //fetchInfoTMBD(titlesToSearch, movieSearchUrl)
 }
 
 
