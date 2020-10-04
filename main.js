@@ -7,6 +7,7 @@ const youTubeEmbedUrl = "https://www.youtube.com/embed/"
 const apiKey = "3324330d7274c224e88ee5dbc2a0b10b"
 const apiKeyGoogle = "AIzaSyCQd6wTexIF0NbJw4PDsfTdJCnBFNa6E-w"
 let i = 0
+let j = 0
 let titlesToSearch = []
 let browseArrayItems = []
 let browseArrayNotDisplayed = store.media.slice()
@@ -28,14 +29,15 @@ const queryParams = {
 
 const otherVars = {
     loadIndvPage: false,
-    youTubeID: ''
+    youTubeID: '',
+    genre: '',
+    genreCode: ''
 }
 
 //----------HTML Template Functions----------//
 
 
 //ToDO:
-//Add YouTube API for trailers
 //make it possible to search using the advanced search parameters
 //make sure suggestion box works
 
@@ -47,8 +49,22 @@ const otherVars = {
 
 //----------Render Functions----------//
 
+function makeGenreList(responseJson){
+    var genresToList = []
+    for (i=0; i < responseJson.results[0].genre_ids.length; i++){
+        for (j=0; j < genres.ids.length; j++){
+            if (genres.ids[j].id == responseJson.results[0].genre_ids[i]){
+                genresToList.push(' ' + genres.ids[j].name)
+            }
+        }
+    }
+    return genresToList
+}
+
 function renderResults(responseJson){
     console.log("renderResults run 4.1")
+    console.log(responseJson)    
+    var genresToList = makeGenreList(responseJson)   
     imageUrlSuffix = responseJson.results[0].backdrop_path
     if (imageUrlSuffix === null){
         imageUrlSuffix = responseJson.results[0].poster_path
@@ -60,6 +76,8 @@ function renderResults(responseJson){
                 <a href='javascript:handleTitleClick("${responseJson.results[0].original_title}")' class='js-indv-link'>${responseJson.results[0].original_title}</a>
                 <br>
                 <p>${responseJson.results[0].overview}</p>
+                <br> 
+                <p>Genres: ${genresToList}</p>
             </div>
             <div class="item">
                 <img src="${imageSearchUrl + 'w780' + imageUrlSuffix}" alt="placeholder">
@@ -73,6 +91,8 @@ function renderResults(responseJson){
                 <a href='javascript:handleTitleClick("${responseJson.results[0].original_name}")' class="js-indv-link">${responseJson.results[0].original_name}</a>
                 <br>
                 <p>${responseJson.results[0].overview}</p>
+                <br> 
+                <p>Genres: ${genresToList}</p>
             </div>
             <div class="item">
                 <img src="${imageSearchUrl + 'w780' + imageUrlSuffix}" alt="placeholder">
@@ -85,6 +105,7 @@ function renderResults(responseJson){
 function renderIndvPage(responseJson){
     console.log("renderIndvPage run 4.2")
     console.log('rendering ', responseJson)
+    var genresToList = makeGenreList(responseJson)  
     imageUrlSuffix = responseJson.results[0].backdrop_path
     if (imageUrlSuffix === null){
         imageUrlSuffix = responseJson.results[0].poster_path
@@ -96,6 +117,8 @@ function renderIndvPage(responseJson){
             <iframe width="560" height="315" src="${youTubeEmbedUrl}${otherVars.youTubeID}" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
             <br>
             <p>${responseJson.results[0].overview}</p>
+            <br> 
+                <p>Genres: ${genresToList}</p>
         </div>`)
     }
     else{
@@ -105,7 +128,20 @@ function renderIndvPage(responseJson){
             <iframe width="560" height="315" src="${youTubeEmbedUrl}${otherVars.youTubeID}" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
             <br>
             <p>${responseJson.results[0].overview}</p>
+            <br> 
+                <p>Genres: ${genresToList}</p>
         </div>`)
+    }
+}
+
+function renderGenreSearchResults(responseJson){
+    for (i=0; i < responseJson.results[0].genre_ids.length; i++){
+        if (responseJson.results[0].genre_ids[i] == otherVars.genreCode){
+            renderResults(responseJson)
+        }
+        else{
+            console.log(responseJson.results[0].genre_ids[i], otherVars.genreCode)
+        }
     }
 }
 
@@ -151,7 +187,21 @@ function fetchInfoTMBD(items,searchUrl) {
         .then(response => response.json())
         .then(responseJson => 
             whichPageToRender(responseJson))
-        .catch(error => console.log("Couldn't find "+ items[i] + " in database")); //here lets eventually make it call a function that searches in an alternate database (one that I'll make probably) to see if that works before writing to the console that it can't find it.
+        //.catch(error => console.log("Couldn't find "+ items[i] + " in database")); //here lets eventually make it call a function that searches in an alternate database (one that I'll make probably) to see if that works before writing to the console that it can't find it.
+    }
+}
+
+function fetchGenreResults(searchUrl){
+    for (i=0; i < store.media.length; i++){
+        queryParams.tmdb.query = store.media[i].title
+        var queryString = formatQueryParams(queryParams.tmdb)
+        console.log(queryString)
+        var url = searchUrl + queryString
+        fetch(url)
+        .then(response => response.json())
+        .then(responseJson => 
+            renderGenreSearchResults(responseJson))
+        .catch(error => console.log("Couldn't find "+ store.media[i] + " in database")); //here lets eventually make it call a function that searches in an alternate database (one that I'll make probably) to see if that works before writing to the console that it can't find it.
     }
 }
  
@@ -192,6 +242,17 @@ function findTitleInStore(title){
     console.log(titlesToSearch,": in find titlein store")
     return titlesToSearch
 }
+
+function findGenreCode(genre){
+    var genreCode = ''
+    for (i=0; i < genres.ids.length; i++){
+        if (genres.ids[i].name.toLowerCase().includes(genre.toLowerCase())){
+            genreCode = genres.ids[i].id
+        }
+    }
+    return genreCode
+}
+
 
 //----------Loading Browse Window Functions----------//
 
@@ -240,7 +301,20 @@ function handleTitleClick(title){
     fetchInfoYouTube(titlesToSearch[0].title, youTubeInfoSearchUrl)
     console.log(otherVars.youTubeID)
     otherVars.loadIndvPage = true
-    //fetchInfoTMBD(titlesToSearch, movieSearchUrl)
+}
+
+function handleSearchGenreClick(){
+    console.log('handleSearchGenreClick run')
+    $('main').on('click', '#genre-button', event =>{
+        event.preventDefault()
+        otherVars.loadIndvPage = false
+        $('ul.results-list').empty()
+        $('.results').removeClass('hidden')
+        otherVars.genre = $('#genre').val()
+        otherVars.genreCode = findGenreCode(otherVars.genre)
+        console.log(queryParams.tmdb.query)
+        fetchGenreResults(movieSearchUrl)
+    })
 }
 
 
@@ -249,6 +323,7 @@ function callbackFun(){
     loadBrowse()
     handleAdvSearchClick()
     handleSearchClick()
+    handleSearchGenreClick()
 }
   
 $(callbackFun);

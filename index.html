@@ -21,19 +21,43 @@
         <section class="search">
             <form id="search-form">
                 <input id="search-bar" name="search" type="text">
-                <button class="js-search-button" type="submit">Search</button>
+                <button class="js-search-button" type="submit">Search Title</button>
             </form>
             <br>
-            <button class="js-advSearch">Advanced Search</button>
+            <button class="js-advSearch">Search Options</button>
             <form id="advSearchForm" class="hidden">
                 <label for='genre'>Genre:</label>
-                <input id="genre" name="adv-search" type="text">
+                <!--<input id="genre" name="adv-search" type="text">-->
+                <select id="genre" name="adv-search">
+                    <option value="Action">Action</option>
+                    <option value="Adventure">Adventure</option>
+                    <option value="Animation">Animation</option>
+                    <option value="Comedy">Comedy</option>
+                    <option value="Crime">Crime</option>
+                    <option value="Documentary">Documentary</option>
+                    <option value="Drama">Drama</option>
+                    <option value="Family">Family</option>
+                    <option value="Fantasy">Fantasy</option>
+                    <option value="History">History</option>
+                    <option value="Horror">Horror</option>
+                    <option value="Music">Music</option>
+                    <option value="Mystery">Mystery</option>
+                    <option value="Romance">Romance</option>
+                    <option value="Science Fiction">Science Fiction</option>
+                    <option value="TV Movie">TV Movie</option>
+                    <option value="Thriller">Thriller</option>
+                    <option value="War">War</option>
+                    <option value="Western">Western</option>
+                </select>
+                <button id="genre-button" class="js-search-button">Search Genre</button>
                 <br>
                 <label for='language'>Language:</label>
                 <input id="language" name="adv-search" type="text">
+                <button id="language-button" class="js-search-button">Search Language</button>
                 <br>
                 <label for='country'>Country:</label>
                 <input id="country" name="adv-search" type="text">
+                <button id="country-button" class="js-search-button">Search Country</button>
             </form>
         </section>
         <section class="results hidden">
