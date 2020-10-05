@@ -175,7 +175,7 @@ const store = {
       triggers: ['none']
     },
     {
-      title: 'Kyss Mig',
+      title: 'With Every Heartbeat', //kyss mig
       format: 'movie',
       ending: 'Happy',
       occasions: [],
@@ -210,7 +210,7 @@ const store = {
       triggers: ['?']
     },
     {
-      title: 'Young and Wild',
+      title: 'Joven y Alocada', //Young and Wild
       format: 'movie',
       ending: '?',
       occasions: [],
@@ -385,7 +385,7 @@ const store = {
       triggers: ['Gratuitous Violence']
     },
     {
-      title: 'Skins',
+      title: 'Skins (UK)',
       format: 'tv-show',
       ending: 'Happy',
       occasions: [],

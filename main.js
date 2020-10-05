@@ -1,17 +1,17 @@
 'use strict'
 
 const movieSearchUrl = "https://api.themoviedb.org/3/search/multi?"
-const imageSearchUrl = "http://image.tmdb.org/t/p/"
+const imageSearchUrl = "https://image.tmdb.org/t/p/"
 const youTubeInfoSearchUrl = "https://www.googleapis.com/youtube/v3/search?"
 const youTubeEmbedUrl = "https://www.youtube.com/embed/"
+const omdbSearchUrl = "https://www.omdbapi.com/?"
 const apiKey = "3324330d7274c224e88ee5dbc2a0b10b"
 const apiKeyGoogle = "AIzaSyCQd6wTexIF0NbJw4PDsfTdJCnBFNa6E-w"
+const apiKeyOmdb = "8ef190b6"
 let i = 0
 let j = 0
-let titlesToSearch = []
 let browseArrayItems = []
 let browseArrayNotDisplayed = store.media.slice()
-let imageUrlSuffix = ''
 
 
 const queryParams = {
@@ -24,6 +24,11 @@ const queryParams = {
         part: "snippet",
         maxResults: 10,
         q: ''
+    },
+    omdb:{
+        apikey: apiKeyOmdb,
+        t: '',
+        plot: 'full'
     }
 }
 
@@ -31,7 +36,9 @@ const otherVars = {
     loadIndvPage: false,
     youTubeID: '',
     genre: '',
-    genreCode: ''
+    genreCode: '',
+    imageUrlSuffix: [],
+    titlesToSearch: []
 }
 
 //----------HTML Template Functions----------//
@@ -39,13 +46,17 @@ const otherVars = {
 
 //ToDO:
 //make it possible to search using the advanced search parameters
+    //language
 //make sure suggestion box works
 
-//add in other info on search page
+//fix bug where it won't look for things with special characters
+//make it possible to search again after loading the individual page
 
 //add function to handle not-found items on the list
 //add footer with TMDB logo
-//When the original title is in a different language, maybe search and display the english one or both?
+
+
+
 
 //----------Render Functions----------//
 
@@ -63,75 +74,46 @@ function makeGenreList(responseJson){
 
 function renderResults(responseJson){
     console.log("renderResults run 4.1")
-    console.log(responseJson)    
-    var genresToList = makeGenreList(responseJson)   
-    imageUrlSuffix = responseJson.results[0].backdrop_path
-    if (imageUrlSuffix === null){
-        imageUrlSuffix = responseJson.results[0].poster_path
-    }
-    if (responseJson.results[0].media_type == 'movie'){
-        $('ul.results-list').append(`
+    console.log(responseJson)
+    console.log(otherVars.imageUrlSuffix)
+    console.log(otherVars.imageCount)
+    $('ul.results-list').append(`
         <li class="result-entry group">
             <div class="item">
-                <a href='javascript:handleTitleClick("${responseJson.results[0].original_title}")' class='js-indv-link'>${responseJson.results[0].original_title}</a>
+                <a href='javascript:handleTitleClick("${responseJson.Title}")' class='js-indv-link'>${responseJson.Title}</a>
                 <br>
-                <p>${responseJson.results[0].overview}</p>
-                <br> 
-                <p>Genres: ${genresToList}</p>
+                <p>${responseJson.Plot}</p>
+                <p>Genres: ${responseJson.Genre} </p>
+                <p>Release Year: ${responseJson.Year}</p>
+                <p>Director: ${responseJson.Director}</p>
+                <p>Writer: ${responseJson.Writer}</p>
+                <p>Cast: ${responseJson.Actors}</p>
+                <p>Original Language: ${responseJson.Language} </p>
+                <p>Country: ${responseJson.Country}</p>
             </div>
             <div class="item">
-                <img src="${imageSearchUrl + 'w780' + imageUrlSuffix}" alt="placeholder">
+                <img src="${imageSearchUrl + 'w780' + otherVars.imageUrlSuffix[String(responseJson.Title)]}" alt="placeholder">
             </div>
         </li>`)
-    }
-    else {
-        $('ul.results-list').append(`
-        <li class="result-entry group">
-            <div class="item">
-                <a href='javascript:handleTitleClick("${responseJson.results[0].original_name}")' class="js-indv-link">${responseJson.results[0].original_name}</a>
-                <br>
-                <p>${responseJson.results[0].overview}</p>
-                <br> 
-                <p>Genres: ${genresToList}</p>
-            </div>
-            <div class="item">
-                <img src="${imageSearchUrl + 'w780' + imageUrlSuffix}" alt="placeholder">
-            </div>
-        </li>`)
-    }
-
+    otherVars.imageCount += 1
 }
 
 function renderIndvPage(responseJson){
     console.log("renderIndvPage run 4.2")
-    console.log('rendering ', responseJson)
-    var genresToList = makeGenreList(responseJson)  
-    imageUrlSuffix = responseJson.results[0].backdrop_path
-    if (imageUrlSuffix === null){
-        imageUrlSuffix = responseJson.results[0].poster_path
-    }
-    if (responseJson.results[0].media_type == 'movie'){
         $('ul.results-list').replaceWith(`
         <div>
-            <h2>${responseJson.results[0].original_title}</h2>
+            <h2>${responseJson.Title}</h2>
             <iframe width="560" height="315" src="${youTubeEmbedUrl}${otherVars.youTubeID}" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
             <br>
-            <p>${responseJson.results[0].overview}</p>
-            <br> 
-                <p>Genres: ${genresToList}</p>
+            <p>${responseJson.Plot}</p>
+            <p>Genres: ${responseJson.Genre} </p>
+            <p>Release Year: ${responseJson.Year}</p>
+            <p>Director: ${responseJson.Director}</p>
+            <p>Writer: ${responseJson.Writer}</p>
+            <p>Cast: ${responseJson.Actors}</p>
+            <p>Original Language: ${responseJson.Language} </p>
+            <p>Country: ${responseJson.Country}</p>
         </div>`)
-    }
-    else{
-        $('ul.results-list').replaceWith(`
-        <div>
-            <h2>${responseJson.results[0].original_name}</h2>
-            <iframe width="560" height="315" src="${youTubeEmbedUrl}${otherVars.youTubeID}" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
-            <br>
-            <p>${responseJson.results[0].overview}</p>
-            <br> 
-                <p>Genres: ${genresToList}</p>
-        </div>`)
-    }
 }
 
 function renderGenreSearchResults(responseJson){
@@ -160,7 +142,23 @@ function whichPageToRender(responseJson){
 
 //----------Search Functions----------//
 
-//---TMBD-----//
+//-----OMBD-----//
+
+function fetchInfoOmbd(title,searchUrl){   
+    console.log(title)
+    queryParams.omdb.t = title
+    var queryString = formatQueryParams(queryParams.omdb)
+    console.log(queryString)
+    var url = searchUrl + queryString
+    fetch(url)
+    .then(response => response.json())
+    .then(responseJson => 
+        whichPageToRender(responseJson))
+    //.catch(error => console.log("Couldn't find ")
+}
+
+
+//-----TMBD-----//
 
 function formatQueryParams(queryArray){
     const queryItems = Object.keys(queryArray)
@@ -168,12 +166,58 @@ function formatQueryParams(queryArray){
   return queryItems.join('&');
 }
 
+function saveImagePath(responseJson){
+    if (responseJson.results[0].backdrop_path === null){
+        if (responseJson.results[0].media_type == 'movie'){
+            if (responseJson.results[0].original_language === "en"){
+                otherVars.imageUrlSuffix[String(responseJson.results[0].original_title)] = responseJson.results[0].poster_path
+                fetchInfoOmbd(responseJson.results[0].original_title, omdbSearchUrl)
+            }
+            else{
+                otherVars.imageUrlSuffix[String(responseJson.results[0].title)] = responseJson.results[0].poster_path
+                fetchInfoOmbd(responseJson.results[0].title, omdbSearchUrl)
+            }
+        }
+        else{
+            if (responseJson.results[0].original_language === "en"){
+                otherVars.imageUrlSuffix[String(responseJson.results[0].original_name)] = responseJson.results[0].poster_path
+                fetchInfoOmbd(responseJson.results[0].original_name, omdbSearchUrl)
+            }
+            else{
+                otherVars.imageUrlSuffix[String(responseJson.results[0].name)] = responseJson.results[0].poster_path
+                fetchInfoOmbd(responseJson.results[0].name, omdbSearchUrl)
+            }
+        }
+    }
+    else{
+        if (responseJson.results[0].media_type == 'movie'){
+            if (responseJson.results[0].original_language === "en"){
+                otherVars.imageUrlSuffix[String(responseJson.results[0].original_title)] = responseJson.results[0].backdrop_path
+                fetchInfoOmbd(responseJson.results[0].original_title, omdbSearchUrl)
+            }
+            else{
+                otherVars.imageUrlSuffix[String(responseJson.results[0].title)] = responseJson.results[0].backdrop_path
+                fetchInfoOmbd(responseJson.results[0].title, omdbSearchUrl)
+            }
+        }
+        else{
+            if (responseJson.results[0].original_language === "en"){
+                otherVars.imageUrlSuffix[String(responseJson.results[0].original_name)] = responseJson.results[0].backdrop_path
+                fetchInfoOmbd(responseJson.results[0].original_name, omdbSearchUrl)
+            }
+            else{
+                otherVars.imageUrlSuffix[String(responseJson.results[0].name)] = responseJson.results[0].backdrop_path
+                fetchInfoOmbd(responseJson.results[0].name, omdbSearchUrl)
+            }
+        }
+    }
+}
+
 
 function fetchInfoTMBD(items,searchUrl) {
     console.log('fetchInfotmdb run2');
     console.log('fetching in tmdb',items)
     for (i=0; i < items.length; i++){
-        console.log(items)
         if (items[i].title === undefined){
             queryParams.tmdb.query = items[i]
         }
@@ -181,12 +225,12 @@ function fetchInfoTMBD(items,searchUrl) {
             queryParams.tmdb.query = items[i].title
         }
         var queryString = formatQueryParams(queryParams.tmdb)
-        console.log(queryString)
+        //console.log(queryString)
         var url = searchUrl + queryString
         fetch(url)
         .then(response => response.json())
         .then(responseJson => 
-            whichPageToRender(responseJson))
+            saveImagePath(responseJson))
         //.catch(error => console.log("Couldn't find "+ items[i] + " in database")); //here lets eventually make it call a function that searches in an alternate database (one that I'll make probably) to see if that works before writing to the console that it can't find it.
     }
 }
@@ -205,10 +249,9 @@ function fetchGenreResults(searchUrl){
     }
 }
  
-//---YouTube-----//
+//-----YouTube-----//
 function saveYouTubeId(responseJson){
     console.log('saveYouTubeId run 7')
-    console.log(responseJson)
     otherVars.youTubeID = responseJson.items[0].id.videoId
     var title = [queryParams.youTube.q.replace(" official trailer", '')]
     console.log (title)
@@ -218,7 +261,6 @@ function saveYouTubeId(responseJson){
 
 function fetchInfoYouTube(title,searchUrl) {
     console.log('fetchInfoYouTube run 6');
-    console.log(title)
     queryParams.youTube.q = title + " official trailer"
     var queryString = formatQueryParams(queryParams.youTube)
     var url = searchUrl + queryString
@@ -229,18 +271,18 @@ function fetchInfoYouTube(title,searchUrl) {
     //.catch(error => console.log("something went wrong"))//"Couldn't find "+ items[i] + " in database")); //here lets eventually make it call a function that searches in an alternate database (one that I'll make probably) to see if that works before writing to the console that it can't find it.
 }
 
- //---LG store-----//
+ //-----LG store-----//
 
 function findTitleInStore(title){
-    titlesToSearch = [] 
+    otherVars.titlesToSearch = [] 
     console.log(title,": in find titlein store")
     for (i=0; i < store.media.length; i++){
         if (store.media[i].title.toLowerCase().includes(title.toLowerCase())){
-            titlesToSearch.push(store.media[i])
+            otherVars.titlesToSearch.push(store.media[i])
         }
     }
-    console.log(titlesToSearch,": in find titlein store")
-    return titlesToSearch
+    console.log(otherVars.titlesToSearch,": in find titlein store")
+    //return otherVars.titlesToSearch
 }
 
 function findGenreCode(genre){
@@ -279,9 +321,9 @@ function handleSearchClick(){
         $('ul.results-list').empty()
         $('.results').removeClass('hidden')
         queryParams.tmdb.query = $(event.currentTarget).find('#search-bar').val()
-        titlesToSearch = findTitleInStore(queryParams.tmdb.query)
-        console.log(titlesToSearch)
-        fetchInfoTMBD(titlesToSearch, movieSearchUrl)
+        findTitleInStore(queryParams.tmdb.query)
+        console.log(otherVars.titlesToSearch)
+        fetchInfoTMBD(otherVars.titlesToSearch, movieSearchUrl)
     });
 }
 
@@ -296,9 +338,9 @@ function handleTitleClick(title){
     console.log('handleTitleClick run 5')
     console.log(title)
     $('ul.results-list').empty()
-    titlesToSearch = findTitleInStore(title)
-    console.log(titlesToSearch)
-    fetchInfoYouTube(titlesToSearch[0].title, youTubeInfoSearchUrl)
+    findTitleInStore(title)
+    console.log(otherVars.titlesToSearch)
+    fetchInfoYouTube(otherVars.titlesToSearch[0].title, youTubeInfoSearchUrl)
     console.log(otherVars.youTubeID)
     otherVars.loadIndvPage = true
 }
