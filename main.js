@@ -12,6 +12,8 @@ let i = 0
 let j = 0
 let browseArrayItems = []
 let browseArrayNotDisplayed = store.media.slice()
+let imageUrlToPrint = ''
+let correction = ''
 
 
 const queryParams = {
@@ -49,7 +51,6 @@ const otherVars = {
 //ToDO:
 //make sure suggestion box works
 
-//fix bug where it won't look for things with special characters
 //make it possible to search again after loading the individual page
 
 //add function to handle not-found items on the list
@@ -61,11 +62,19 @@ const otherVars = {
 //----------Render Functions----------//
 
 function renderResults(responseJson){
-    console.log("renderResults run 4.1")
+    correction = checkForCorrections(responseJson.Title,"image")
+    if (correction === undefined){
+        imageUrlToPrint = imageSearchUrl + 'w780' + otherVars.imageUrlSuffix[String(responseJson.Title)]
+    }   
+    else{
+        imageUrlToPrint = correction
+    }
+    let titleToSend = String(responseJson.Title)
+    titleToSend = titleToSend.replace(/'/g, "*")
     $('ul.results-list').append(`
         <li class="result-entry group">
             <div class="item">
-                <a href='javascript:handleTitleClick("${responseJson.Title}")' class='js-indv-link'>${responseJson.Title}</a>
+                <a href='javascript:handleTitleClick("${titleToSend}")' class='js-indv-link'>${responseJson.Title}</a>
                 <br>
                 <p>${responseJson.Plot}</p>
                 <p>Genres: ${responseJson.Genre} </p>
@@ -77,10 +86,9 @@ function renderResults(responseJson){
                 <p>Country: ${responseJson.Country}</p>
             </div>
             <div class="item">
-                <img src="${imageSearchUrl + 'w780' + otherVars.imageUrlSuffix[String(responseJson.Title)]}" alt="placeholder">
+                <img src="${imageUrlToPrint}" alt="placeholder">
             </div>
         </li>`)
-    otherVars.imageCount += 1
 }
 
 function renderIndvPage(responseJson){
@@ -102,7 +110,6 @@ function renderIndvPage(responseJson){
 }
 
 function whichPageToRender(responseJson){
-    console.log("whichPageToRender run 3")
     if (otherVars.loadIndvPage){
         renderIndvPage(responseJson)
     }
@@ -114,10 +121,48 @@ function whichPageToRender(responseJson){
 
 //----------Search Functions----------//
 
+function checkForCorrections(title, type){
+    if (type === "name") {
+        for (i=0; i < corrections.name.length; i++){
+            if (corrections.name[i].tmdbTitle === title){
+                return corrections.name[i].omdbTitle
+            }
+        }
+    }
+    else if (type === "image"){
+        for (i=0; i < corrections.image.length; i++){
+            if (corrections.image[i].omdbTitle === title){
+                return corrections.image[i].imageUrl
+            }
+        }
+    }
+    else if (type === "nameReverse"){
+        for (i=0; i < corrections.name.length; i++){
+            if (corrections.name[i].omdbTitle === title){
+                return corrections.name[i].tmdbTitle
+            }
+        }
+    }
+    else if (type === "youTube"){
+        for (i=0; i < corrections.youTube.length; i++){
+            if (corrections.youTube[i].title === title){
+                return corrections.youTube[i].search
+            }
+        }
+    }
+    
+}
+
 //-----OMBD-----//
 
-function fetchInfoOmbd(title,searchUrl){   
-    queryParams.omdb.t = title
+function fetchInfoOmbd(title,searchUrl){
+    correction = checkForCorrections(title,"name")
+    if (correction === undefined){
+        queryParams.omdb.t = title
+    }   
+    else{
+        queryParams.omdb.t = correction
+    }
     var queryString = formatQueryParams(queryParams.omdb)
     var url = searchUrl + queryString
     fetch(url)
@@ -186,6 +231,7 @@ function saveImagePath(responseJson){
 
 function fetchInfoTMBD(items,searchUrl) {
     console.log('fetchInfotmdb run2');
+    console.log(items)
     for (i=0; i < items.length; i++){
         if (items[i].title === undefined){
             queryParams.tmdb.query = items[i]
@@ -193,13 +239,17 @@ function fetchInfoTMBD(items,searchUrl) {
         else{
             queryParams.tmdb.query = items[i].title
         }
+        if (queryParams.tmdb.query === "Kiss Me"){
+            queryParams.tmdb.query ="With Every Heartbeat"
+        }
         var queryString = formatQueryParams(queryParams.tmdb)
+        console.log(queryString)
         var url = searchUrl + queryString
         fetch(url)
         .then(response => response.json())
         .then(responseJson => 
             saveImagePath(responseJson))
-        .catch(error => console.log("Couldn't find "+ items[i] + " in database")); //here lets eventually make it call a function that searches in an alternate database (one that I'll make probably) to see if that works before writing to the console that it can't find it.
+        //.catch(error => console.log("Couldn't find "+ items[i] + " in database")); //here lets eventually make it call a function that searches in an alternate database (one that I'll make probably) to see if that works before writing to the console that it can't find it.
     }
 }
 
@@ -220,7 +270,7 @@ function fetchSearchResults(searchUrl){
         .then(response => response.json())
         .then(responseJson => 
             testIfMatching(responseJson))
-        .catch(error => console.log("Couldn't find "+ store.media[i].title + " in database"));
+        .catch(error => console.log("Couldn't find something in database"))//+ store.media[i].title + " in database"));
     }
 }
  
@@ -234,7 +284,14 @@ function saveYouTubeId(responseJson){
 
 function fetchInfoYouTube(title,searchUrl) {
     console.log('fetchInfoYouTube run 6');
-    queryParams.youTube.q = title + " official trailer"
+    correction = checkForCorrections(title,"youTube")
+    if (correction === undefined){
+        queryParams.youTube.q = title + " official trailer"
+    }   
+    else{
+        queryParams.youTube.q = correction + " official trailer"
+    }
+    console.log(queryParams.youTube.q)
     var queryString = formatQueryParams(queryParams.youTube)
     var url = searchUrl + queryString
     fetch(url)
@@ -264,6 +321,7 @@ function loadBrowse(){
     for (i=0; i < 10; i++){
         browseArrayItems.push(browseArrayNotDisplayed.splice(Math.random()*(browseArrayNotDisplayed.length-1),1).pop())
     }
+    console.log(browseArrayItems)
     fetchInfoTMBD(browseArrayItems,movieSearchUrl)
 }
 
@@ -279,19 +337,15 @@ function handleSearchClick(){
         $('.results').removeClass('hidden')
         otherVars.searchQuery = $(event.currentTarget).find('#search-bar').val()
         otherVars.searchCategory = $(event.currentTarget).find('#search-category').val()
-        if (otherVars.searchCategory === "title"){
-            findTitleInStore(queryParams.tmdb.query)
-            fetchInfoTMBD(otherVars.titlesToSearch, movieSearchUrl)
-        }
-        else{
-            fetchSearchResults(omdbSearchUrl)
-        }
+        console.log(otherVars.searchQuery)
+        fetchSearchResults(omdbSearchUrl)
     });
 }
 
 function handleTitleClick(title){
     console.log('handleTitleClick run 5')
     $('ul.results-list').empty()
+    title = title.replace("*", "\'")
     findTitleInStore(title)
     fetchInfoYouTube(otherVars.titlesToSearch[0].title, youTubeInfoSearchUrl)
     otherVars.loadIndvPage = true

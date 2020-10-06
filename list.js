@@ -1,90 +1,7 @@
-const genres ={
-  ids: [
-    {
-      id: 28,
-      name: "Action"
-    },
-    {
-      id: 12,
-      name: "Adventure"
-    },
-    {
-      id: 16,
-      name: "Animation"
-    },
-    {
-      id: 35,
-      name: "Comedy"
-    },
-    {
-      id: 80,
-      name: "Crime"
-    },
-    {
-      id: 99,
-      name: "Documentary"
-    },
-    {
-      id: 18,
-      name: "Drama"
-    },
-    {
-      id: 10751,
-      name: "Family"
-    },
-    {
-      id: 14,
-      name: "Fantasy"
-    },
-    {
-      id: 36,
-      name: "History"
-    },
-    {
-      id: 27,
-      name: "Horror"
-    },
-    {
-      id: 10402,
-      name: "Music"
-    },
-    {
-      id: 9648,
-      name: "Mystery"
-    },
-    {
-      id: 10749,
-      name: "Romance"
-    },
-    {
-      id: 878,
-      name: "Science Fiction"
-    },
-    {
-      id: 10770,
-      name: "TV Movie"
-    },
-    {
-      id: 53,
-      name: "Thriller"
-    },
-    {
-      id: 10752,
-      name: "War"
-    },
-    {
-      id: 37,
-      name: "Western"
-    }
-  ]
-}
-
-
-
 const store = {
   media: [
     {
-      title: 'Imagine Me and You',
+      title: 'Imagine Me & You',
       format: 'movie',
       ending: 'Happy',
       occasions: [],
@@ -105,7 +22,7 @@ const store = {
       triggers: ['Domestic Violence']
     },
     {
-      title: 'Aimee and Jaguar',
+      title: 'Aimee & Jaguar',
       format: 'movie',
       ending: 'Sad',
       occasions: [],
@@ -147,7 +64,7 @@ const store = {
       triggers: ['none']
     },
     {
-      title: 'But I’m A Cheerleader',
+      title: "But I'm A Cheerleader",
       format: 'movie',
       ending: 'Happy',
       occasions: [],
@@ -161,7 +78,7 @@ const store = {
       triggers: ['none']
     },
     {
-      title: 'Professor Marsten and the Wonder Women',//fix
+      title: 'Professor Marston & the Wonder Women',//fix
       format: 'movie',
       ending: 'Happy',
       occasions: [],
@@ -175,7 +92,7 @@ const store = {
       triggers: ['none']
     },
     {
-      title: 'With Every Heartbeat', //kyss mig
+      title: 'Kiss Me', //kyss mig
       format: 'movie',
       ending: 'Happy',
       occasions: [],
@@ -210,7 +127,7 @@ const store = {
       triggers: ['?']
     },
     {
-      title: 'Joven y Alocada', //Young and Wild
+      title: 'Young and Wild', //Young and Wild
       format: 'movie',
       ending: '?',
       occasions: [],
@@ -252,7 +169,7 @@ const store = {
       triggers: ['?']
     },
     {
-      title: 'Heartland Movie',
+      title: 'Heartland',
       format: 'movie',
       ending: '?',
       occasions: [],
@@ -294,7 +211,7 @@ const store = {
       triggers: ['none']
     },
     {
-      title: 'Can’t Think Straight',
+      title: "I Can't Think Straight",
       format: 'movie',
       ending: 'Happy',
       occasions: [],
@@ -308,21 +225,21 @@ const store = {
       triggers: ['Self-Harm']
     },
     {
-      title: 'L’amore è Imperfetto',
+      title: "Love Is Not Perfect",
       format: 'movie',
       ending: '?',
       occasions: [],
       triggers: ['?']
     },
     {
-      title: 'Sor Juana',
+      title: 'I, the Worst of All',
       format: 'movie',
       ending: 'Sad',
       occasions: [],
       triggers: ['none']
     },
     {
-      title: 'Jennifer’s Body',
+      title: "Jennifer's Body",
       format: 'movie',
       ending: 'Sad',
       occasions: [],
@@ -336,14 +253,14 @@ const store = {
       triggers: ['none']
     },
     {
-      title: 'Carmen y Lola',
+      title: 'Carmen & Lola',
       format: 'movie',
       ending: 'Happy',
       occasions: [],
       triggers: ['Religion']
     },
     {
-      title: 'Collette',
+      title: 'Colette',
       format: 'movie',
       ending: 'Happy',
       occasions: [],
@@ -441,7 +358,7 @@ const store = {
       triggers: ['?']
     },
     {
-      title: 'Brooklyn 99',
+      title: 'Brooklyn Nine-Nine',
       format: 'tv-show',
       ending: '?',
       occasions: [],
@@ -483,7 +400,7 @@ const store = {
       triggers: ['?']
     },
     {
-      title: 'Everything Sucks',
+      title: 'Everything Sucks!',
       format: 'tv-show',
       ending: 'Happy',
       occasions: [],
@@ -530,6 +447,63 @@ const store = {
       ending: 'Happy',
       occasions: [],
       triggers: ['Suicide','Sexual Violence', 'Gratuitous Violence']
+    },
+  ]
+}
+
+const corrections = {
+  name:[
+    {
+      tmdbTitle: 'Carmen and Lola',
+      omdbTitle: 'Carmen & Lola',
+    },
+    {
+      tmdbTitle: 'With Every Heartbeat',
+      omdbTitle: 'Kiss Me'
+    },
+    {
+      tmdbTitle: 'Skam Spain',
+      omdbTitle: 'Skam España'
+    },
+    {
+      tmdbTitle: 'Professor Marston and the Wonder Women',
+      omdbTitle: 'Professor Marston & the Wonder Women'
+    },
+    {
+      tmdbTitle: 'Joven y Alocada',
+      omdbTitle: 'Young and Wild'
+    },
+  ],
+  image:[
+    {
+    omdbTitle: "Skam España",
+    imageUrl: "https://image.tmdb.org/t/p/w780/bW9M7di0lD6V5JKHT05d94yMTHX.jpg"
+    },
+    {
+      omdbTitle: "Kiss Me",
+      imageUrl: "https://image.tmdb.org/t/p/w780/vrB0K9fDaw4Cu3MNw8CcJ9dn7zp.jpg"
+    },
+    {
+      omdbTitle: "Carmen & Lola",
+      imageUrl: "https://image.tmdb.org/t/p/w780/yAnpRT21JTIqtBSEcKxi0HAPWrI.jpg"
+    },
+    {
+      omdbTitle: "Professor Marston & the Wonder Women",
+      imageUrl: "https://image.tmdb.org/t/p/w780/f9sTcBX9M0BvwBHVvlOIUfNx98r.jpg"
+    },
+    {
+      omdbTitle: "Young and Wild",
+      imageUrl: "https://image.tmdb.org/t/p/w780/4DLTD2DTZkeZ5jANt7nruHzO7Hb.jpg"
+    },
+  ],
+  youTube:[
+    {
+      title: "I, the Worst of All",
+      search: "Yo, la peor de todas"
+    },
+    {
+      title: "Love Is Not Perfect",
+      search: "L'Amore è imperfetto"
     },
   ]
 }
