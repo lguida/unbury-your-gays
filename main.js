@@ -19,7 +19,6 @@ let correction = ''
 const queryParams = {
     tmdb:{
         api_key: apiKey,
-        //language: 'en-US',
         query: ''},
     youTube:{
         key: apiKeyGoogle,
@@ -50,10 +49,8 @@ const otherVars = {
 
 //ToDO:
 //make sure suggestion box works
+    //add a message saying the message has been sent
 
-//make it possible to search again after loading the individual page
-
-//add function to handle not-found items on the list
 //add footer with TMDB logo
 
 
@@ -93,7 +90,7 @@ function renderResults(responseJson){
 
 function renderIndvPage(responseJson){
     console.log("renderIndvPage run 4.2")
-        $('ul.results-list').replaceWith(`
+        $('div.js-indv-page').append(`
         <div>
             <h2>${responseJson.Title}</h2>
             <iframe width="560" height="315" src="${youTubeEmbedUrl}${otherVars.youTubeID}" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
@@ -334,6 +331,7 @@ function handleSearchClick(){
         event.preventDefault()
         otherVars.loadIndvPage = false
         $('ul.results-list').empty()
+        $('div.js-indv-page').empty()
         $('.results').removeClass('hidden')
         otherVars.searchQuery = $(event.currentTarget).find('#search-bar').val()
         otherVars.searchCategory = $(event.currentTarget).find('#search-category').val()

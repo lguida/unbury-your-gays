@@ -168,13 +168,13 @@ const store = {
       occasions: [],
       triggers: ['?']
     },
-    {
-      title: 'Heartland',
-      format: 'movie',
-      ending: '?',
-      occasions: [],
-      triggers: ['?']
-    },
+    //{
+      //title: 'Heartland', //need to write a function that searches by imdb id for this one. imdb id is: tt3920890
+      //format: 'movie',
+      //ending: '?',
+      //occasions: [],
+      //triggers: ['?']
+    //},
     {
       title: 'My Summer of Love',
       format: 'movie',
@@ -246,7 +246,7 @@ const store = {
       triggers: ['Gratuitous Violence']
     },
     {
-      title: 'De Chica en Chica',
+      title: 'Girl Gets Girl',//De Chica en Chica
       format: 'movie',
       ending: 'Happy',
       occasions: [],
@@ -281,7 +281,7 @@ const store = {
       triggers: ['none']
     },
     {
-      title: 'Vita and Virginia',
+      title: 'Vita & Virginia',
       format: 'movie',
       ending: 'Sad',
       occasions: [],
@@ -302,7 +302,7 @@ const store = {
       triggers: ['Gratuitous Violence']
     },
     {
-      title: 'Skins (UK)',
+      title: 'Skins',
       format: 'tv-show',
       ending: 'Happy',
       occasions: [],
@@ -504,6 +504,10 @@ const corrections = {
     {
       title: "Love Is Not Perfect",
       search: "L'Amore è imperfetto"
+    },
+    {
+      title: "Girl Gets Girl",
+      search: "De Chica en Chica"
     },
   ]
 }
