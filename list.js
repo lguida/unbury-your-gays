@@ -473,6 +473,10 @@ const corrections = {
       tmdbTitle: 'Joven y Alocada',
       omdbTitle: 'Young and Wild'
     },
+    {
+      tmdbTitle: 'Liz en Septiembre',
+      omdbTitle: 'Liz in September'
+    },
   ],
   image:[
     {
@@ -508,6 +512,10 @@ const corrections = {
     {
       title: "Girl Gets Girl",
       search: "De Chica en Chica"
+    },
+    {
+      title: "Gypsy",
+      search: "Gypsy Netflix"
     },
   ]
 }

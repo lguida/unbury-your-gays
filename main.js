@@ -41,7 +41,8 @@ const otherVars = {
     imageUrlSuffix: [],
     titlesToSearch: [],
     searchCategory: '',
-    searchQuery: ''
+    searchQuery: '',
+    saveTitle:''
 }
 
 //----------HTML Template Functions----------//
@@ -70,39 +71,56 @@ function renderResults(responseJson){
     titleToSend = titleToSend.replace(/'/g, "*")
     $('ul.results-list').append(`
         <li class="result-entry group">
-            <div class="item">
-                <a href='javascript:handleTitleClick("${titleToSend}")' class='js-indv-link'>${responseJson.Title}</a>
-                <br>
+            <div class="item resultText">
+                <a href='javascript:handleTitleClick("${titleToSend}")' class='js-indv-link indvLink'>${responseJson.Title}</a>
                 <p>${responseJson.Plot}</p>
-                <p>Genres: ${responseJson.Genre} </p>
-                <p>Release Year: ${responseJson.Year}</p>
-                <p>Director: ${responseJson.Director}</p>
-                <p>Writer: ${responseJson.Writer}</p>
-                <p>Cast: ${responseJson.Actors}</p>
-                <p>Original Language: ${responseJson.Language} </p>
-                <p>Country: ${responseJson.Country}</p>
+                <br>
+                <div class="small-text group">
+                    <div class="item">
+                        <p><b>Director:</b> ${responseJson.Director}</p>
+                        <p><b>Writer:</b> ${responseJson.Writer}</p>
+                        <p><b>Cast:</b> ${responseJson.Actors}</p>  
+                    </div>
+                    <div class="item right-item">
+                        <p><b>Genres:</b> ${responseJson.Genre} </p>
+                        <p><b>Release Year:</b> ${responseJson.Year}</p>
+                        <p><b>Original Language:</b> ${responseJson.Language} </p>
+                        <p><b>Country:</b> ${responseJson.Country}</p>
+                    </div>
+                </div>
             </div>
             <div class="item">
                 <img src="${imageUrlToPrint}" alt="placeholder">
             </div>
-        </li>`)
+            
+        </li><hr>`)
 }
 
 function renderIndvPage(responseJson){
     console.log("renderIndvPage run 4.2")
         $('div.js-indv-page').append(`
         <div>
-            <h2>${responseJson.Title}</h2>
-            <iframe width="560" height="315" src="${youTubeEmbedUrl}${otherVars.youTubeID}" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
-            <br>
-            <p>${responseJson.Plot}</p>
-            <p>Genres: ${responseJson.Genre} </p>
-            <p>Release Year: ${responseJson.Year}</p>
-            <p>Director: ${responseJson.Director}</p>
-            <p>Writer: ${responseJson.Writer}</p>
-            <p>Cast: ${responseJson.Actors}</p>
-            <p>Original Language: ${responseJson.Language} </p>
-            <p>Country: ${responseJson.Country}</p>
+            <h2 class="css-page-title">${responseJson.Title}</h2>
+            <div class="group">
+                <iframe  class="item youtube-embed"  src="${youTubeEmbedUrl}${otherVars.youTubeID}" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+                <br>
+                <p class="item">${responseJson.Plot}</p>
+            </div>
+            <div class="group indv-page-box">
+                <div class="item">
+                    <p>Genres: ${responseJson.Genre} </p>
+                    <p>Release Year: ${responseJson.Year}</p>
+                    <p>Director: ${responseJson.Director}</p>
+                </div>
+                <div class="item">
+                    <p>Writer: ${responseJson.Writer}</p>
+                    <p>Cast: ${responseJson.Actors}</p>
+                </div>
+                <div class="item">
+                    <p>Original Language: ${responseJson.Language} </p>
+                    <p>Country: ${responseJson.Country}</p>
+                </div>
+            </div>
         </div>`)
 }
 
@@ -275,6 +293,9 @@ function fetchSearchResults(searchUrl){
 function saveYouTubeId(responseJson){
     otherVars.youTubeID = responseJson.items[0].id.videoId
     var title = [queryParams.youTube.q.replace(" official trailer", '')]
+    if (queryParams.youTube.q === "Gypsy Netflix official trailer"){
+        title = [queryParams.youTube.q.replace(" Netflix official trailer", '')]
+    }
     fetchInfoTMBD(title, movieSearchUrl)
 }
 
@@ -348,6 +369,8 @@ function handleTitleClick(title){
     fetchInfoYouTube(otherVars.titlesToSearch[0].title, youTubeInfoSearchUrl)
     otherVars.loadIndvPage = true
 }
+
+
 
 
 function callbackFun(){

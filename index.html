@@ -5,12 +5,14 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Unbury Your Gays: Main</title>
     <link rel="stylesheet" href="main.css">
+    <link href="https://fonts.googleapis.com/css2?family=Lato&display=swap" rel="stylesheet">
 </head>
+
 <body>
     <header>
       <nav>
         <ul id="menu">
-          <li><a href="index.html">Browse</a></li>
+          <li class="browse-button"><a href="index.html">Browse</a></li>
           <li><a href="suggestion.html">Suggestion Box</a></li>
         </ul>
       </nav>
@@ -18,22 +20,22 @@
 
 
     <main>
-        <section class="search">
-            <form id="search-form">
-                <select id="search-category" name="search">
-                    <option value="Title">Title</option>
+        <section class="wrap">
+            <form id="search-form" class="search-form">
+                <select id="search-category" name="search" class="custom-select">
+                    <option class="test" value="Title">Title</option>
                     <option value="Genre">Genre</option>
                     <option value="Actors">Actor</option>
                     <option value="Director">Director</option>
                     <option value="Language">Language</option>
                     <option value="Country">Country</option>
                 </select>
-                <input id="search-bar" name="search" type="text">
-                <button class="js-search-button" type="submit">Search</button>
+                <input id="search-bar" class="search-bar" name="search" type="text" placeholder="Search...">
+                <button class="js-search-button search-button" type="submit">Search</button>
             </form>
         </section>
         <section class="results hidden">
-            <div class="js-indv-page">
+            <div class="js-indv-page css-indv-page">
             </div>
             <ul class='results-list'>
                 <!--Display Option 2-->
