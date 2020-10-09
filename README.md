@@ -1,6 +1,7 @@
 # Unbury Your Gays
 
 Live app: https://lguida.github.io/unbury-your-gays/
+GitHub repo: https://github.com/lguida/unbury-your-gays
 
 ## Summary
 
