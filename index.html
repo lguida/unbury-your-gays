@@ -22,17 +22,21 @@
     <main>
         <section class="wrap">
             <form id="search-form" class="search-form">
+                <label for="search-category" class="hidden">Select Search Category: options are Title, Genre, Actor, Director, Langauge, Country</label>
                 <select id="search-category" name="search" class="custom-select">
-                    <option class="test" value="Title">Title</option>
+                    <option value="Title">Title</option>
                     <option value="Genre">Genre</option>
                     <option value="Actors">Actor</option>
                     <option value="Director">Director</option>
                     <option value="Language">Language</option>
                     <option value="Country">Country</option>
                 </select>
+                <label for="search-bar" class="hidden">Search bar: enter search query</label>
                 <input id="search-bar" class="search-bar" name="search" type="text" placeholder="Search...">
                 <button class="js-search-button search-button" type="submit">Search</button>
             </form>
+            <button class="js-back-search hidden css-back-button">Return to Search</button>
+            <p class="landing">This app is a mini-database of queer (particularly female-identifying) movies and tv shows. <br>Enter a search term above or scroll down to browse titles!</p>
         </section>
         <section class="results hidden">
             <div class="js-indv-page css-indv-page">

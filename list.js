@@ -1,67 +1,84 @@
 const store = {
+  constants: {
+    movieSearchUrl: "https://api.themoviedb.org/3/search/multi?",
+    imageSearchUrl: "https://image.tmdb.org/t/p/",
+    youTubeInfoSearchUrl: "https://www.googleapis.com/youtube/v3/search?",
+    youTubeEmbedUrl: "https://www.youtube.com/embed/",
+    omdbSearchUrl: "https://www.omdbapi.com/?",
+  },
+
   media: [
     {
       title: 'Imagine Me & You',
       format: 'movie',
       ending: 'Happy',
       occasions: [],
-      triggers: ['none']
+      triggers: ['none'],
+      youTubeID: "hiWKOwRaiig"
     },
     {
       title: 'D.E.B.S.',
       format: 'movie',
       ending: 'Happy',
       occasions: [],
-      triggers: ['none']
+      triggers: ['none'],
+      youTubeID: "R3Unq55oBxQ"
     },
     {
       title: 'Carol',
       format: 'movie',
       ending: 'Sad',
       occasions: [],
-      triggers: ['Domestic Violence']
+      triggers: ['Domestic Violence'],
+      youTubeID: "679wr31SXWk"
     },
     {
       title: 'Aimee & Jaguar',
       format: 'movie',
       ending: 'Sad',
       occasions: [],
-      triggers: ['Holocaust']
+      triggers: ['Holocaust'],
+      youTubeID: "4GzVeNXMfx0"
     },
     {
       title: 'Saving Face',
       format: 'movie',
       ending: 'Happy',
       occasions: [],
-      triggers: ['none']
+      triggers: ['none'],
+      youTubeID: "78h8WeP3Oas"
     },
     {
       title: 'Fingersmith',
       format: 'movie',
       ending: 'Sad',
       occasions: [],
-      triggers: ['none']
+      triggers: ['none'],
+      youTubeID: "uKOpYsb_LEc"
     },
     {
       title: 'Thelma',
       format: 'movie',
       ending: 'Happy',
       occasions: [],
-      triggers: ['Domestic Violence']
+      triggers: ['Domestic Violence'],
+      youTubeID: "vgQMHG9SGlU"
     },
     {
       title: 'The Feels',
       format: 'movie',
       ending: 'Happy',
       occasions: [],
-      triggers: ['none']
+      triggers: ['none'],
+      youTubeID: "flICjXEHqsM"
     },
     {
       title: 'Disobedience',
       format: 'movie',
       ending: 'Sad',
       occasions: [],
-      triggers: ['none']
+      triggers: ['none'],
+      youTubeID: "HEVonh8bjC0"
     },
     {
       title: "But I'm A Cheerleader",
@@ -477,6 +494,14 @@ const corrections = {
       tmdbTitle: 'Liz en Septiembre',
       omdbTitle: 'Liz in September'
     },
+    {
+      tmdbTitle: 'A Christmas Carol',
+      omdbTitle: 'Carol'
+    },
+    {
+      tmdbTitle: 'Thelma & Louise',
+      omdbTitle: 'Thelma'
+    },
   ],
   image:[
     {
@@ -498,6 +523,14 @@ const corrections = {
     {
       omdbTitle: "Young and Wild",
       imageUrl: "https://image.tmdb.org/t/p/w780/4DLTD2DTZkeZ5jANt7nruHzO7Hb.jpg"
+    },
+    {
+      omdbTitle: "Carol",
+      imageUrl: "https://image.tmdb.org/t/p/w780/oiDbubOpusAGJtfWDtPkFtmXGi9.jpg"
+    },
+    {
+      omdbTitle: "Thelma",
+      imageUrl: "https://image.tmdb.org/t/p/w780/lI5h8KaoeObu4NMTwzeRuUHzRwD.jpg"
     },
   ],
   youTube:[

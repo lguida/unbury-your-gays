@@ -1,30 +1,17 @@
 'use strict'
 
-const movieSearchUrl = "https://api.themoviedb.org/3/search/multi?"
-const imageSearchUrl = "https://image.tmdb.org/t/p/"
-const youTubeInfoSearchUrl = "https://www.googleapis.com/youtube/v3/search?"
-const youTubeEmbedUrl = "https://www.youtube.com/embed/"
-const omdbSearchUrl = "https://www.omdbapi.com/?"
-const apiKey = "3324330d7274c224e88ee5dbc2a0b10b"
-const apiKeyGoogle = "AIzaSyCQd6wTexIF0NbJw4PDsfTdJCnBFNa6E-w"
-const apiKeyOmdb = "8ef190b6"
-let browseArrayItems = []
-let browseArrayNotDisplayed = store.media.slice()
-let correction = ''
-
-
 const queryParams = {
     tmdb:{
-        api_key: apiKey,
+        api_key: "3324330d7274c224e88ee5dbc2a0b10b",
         query: ''},
     youTube:{
-        key: apiKeyGoogle,
+        key: "AIzaSyCQd6wTexIF0NbJw4PDsfTdJCnBFNa6E-w",
         part: "snippet",
         maxResults: 10,
         q: ''
     },
     omdb:{
-        apikey: apiKeyOmdb,
+        apikey: "8ef190b6",
         t: '',
         plot: 'full'
     }
@@ -33,60 +20,67 @@ const queryParams = {
 const otherVars = {
     loadIndvPage: false,
     youTubeID: '',
-    genre: '',
-    genreCode: '',
     imageUrlSuffix: [],
-    titlesToSearch: [],
     searchCategory: '',
     searchQuery: '',
-    saveTitle:''
+    browseArrayNotDisplayed: store.media.slice(),
+    browseArrayItems: []
 }
 
-//----------Render Functions----------//
+//----------HTML Template functions ----------//
 
-function renderResults(responseJson){
-    correction = checkForCorrections(responseJson.Title,"image")
+function createSearchResultHTML(responseJson){
+    var correction = checkForCorrections(responseJson.Title,"image")
     if (correction === undefined){
-        var imageUrlToPrint = imageSearchUrl + 'w780' + otherVars.imageUrlSuffix[String(responseJson.Title)]
+        var imageUrlToPrint = store.constants.imageSearchUrl + 'w780' + otherVars.imageUrlSuffix[String(responseJson.Title)]
     }   
     else{
         var imageUrlToPrint = correction
     }
     let titleToSend = String(responseJson.Title)
     titleToSend = titleToSend.replace(/'/g, "*")
-    $('ul.results-list').append(`
-        <li class="result-entry group">
-            <div class="item resultText">
-                <a href='javascript:handleTitleClick("${titleToSend}")' class='js-indv-link indvLink'>${responseJson.Title}</a>
-                <p>${responseJson.Plot}</p>
-                <br>
-                <div class="small-text group">
-                    <div class="item">
-                        <p><b>Director:</b> ${responseJson.Director}</p>
-                        <p><b>Writer:</b> ${responseJson.Writer}</p>
-                        <p><b>Cast:</b> ${responseJson.Actors}</p>  
-                    </div>
-                    <div class="item right-item">
-                        <p><b>Genres:</b> ${responseJson.Genre} </p>
-                        <p><b>Release Year:</b> ${responseJson.Year}</p>
-                        <p><b>Original Language:</b> ${responseJson.Language} </p>
-                        <p><b>Country:</b> ${responseJson.Country}</p>
-                    </div>
+    let stringToRender = `
+    <li class="result-entry group">
+        <div class="item resultText">
+            <a href='javascript:handleTitleClick("${titleToSend}")' class='js-indv-link indvLink'>${responseJson.Title}</a>
+            <p>${responseJson.Plot}</p>
+            <br>
+            <div class="small-text group">
+                <div class="item">
+                    <p><b>Director:</b> ${responseJson.Director}</p>
+                    <p><b>Writer:</b> ${responseJson.Writer}</p>
+                    <p><b>Cast:</b> ${responseJson.Actors}</p>  
+                </div>
+                <div class="item right-item">
+                    <p><b>Genres:</b> ${responseJson.Genre} </p>
+                    <p><b>Release Year:</b> ${responseJson.Year}</p>
+                    <p><b>Original Language:</b> ${responseJson.Language} </p>
+                    <p><b>Country:</b> ${responseJson.Country}</p>
                 </div>
             </div>
-            <div class="item">
-                <img src="${imageUrlToPrint}" alt="placeholder">
-            </div>  
-        </li><hr>`
-    )
+        </div>
+        <div class="item">
+            <img src="${imageUrlToPrint}" alt="${responseJson.Title} poster">
+        </div> 
+        <hr>
+    </li>`
+    return stringToRender
 }
 
-function renderIndvPage(responseJson){
-    $('div.js-indv-page').append(`
+function createIndvPageHTML(responseJson){
+    let youTubeEmbedString = ''
+    let htmlToReturn = ''
+    if (otherVars.youTubeID === ''){
+         youTubeEmbedString = `<p class="youtube-error" >Oops! Sorry, we can't display the YouTube trailer right now</p>`
+    }
+    else {
+         youTubeEmbedString = `<iframe  class="item youtube-embed"  src="${store.constants.youTubeEmbedUrl}${otherVars.youTubeID}" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>`
+    }
+    htmlToReturn =`
         <div>
             <h2 class="css-page-title">${responseJson.Title}</h2>
             <div class="group">
-                <iframe  class="item youtube-embed"  src="${youTubeEmbedUrl}${otherVars.youTubeID}" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+                ${youTubeEmbedString}
                 <br>
                 <p class="item">${responseJson.Plot}</p>
             </div>
@@ -105,16 +99,26 @@ function renderIndvPage(responseJson){
                     <p>Country: ${responseJson.Country}</p>
                 </div>
             </div>
-        </div>`
-    )
+        </div>
+    `
+    return htmlToReturn
 }
+
+//----------Render Functions----------//
+
+function renderResults(stringToRender, whereToAdd){
+    $(whereToAdd).append(stringToRender)
+}
+
 
 function whichPageToRender(responseJson){
     if (otherVars.loadIndvPage){
-        renderIndvPage(responseJson)
+        var stringToRender = createIndvPageHTML(responseJson)
+        renderResults(stringToRender, 'div.js-indv-page')
     }
     else{
-        renderResults(responseJson) 
+        var stringToRender = createSearchResultHTML(responseJson)
+        renderResults(stringToRender, 'ul.results-list') 
     }
 }
 
@@ -156,7 +160,7 @@ function checkForCorrections(title, type){
 //-----OMBD-----//
 
 function fetchInfoOmbd(title,searchUrl){
-    correction = checkForCorrections(title,"name")
+    var correction = checkForCorrections(title,"name")
     if (correction === undefined){
         queryParams.omdb.t = title
     }   
@@ -169,7 +173,7 @@ function fetchInfoOmbd(title,searchUrl){
     .then(response => response.json())
     .then(responseJson => 
         whichPageToRender(responseJson))
-    .catch(error => console.log("Couldn't find ",title))
+    .catch(error => alert("Sorry! Couldn't find ",title))
 }
 
 
@@ -186,21 +190,21 @@ function saveImagePath(responseJson){
         if (responseJson.results[0].media_type == 'movie'){
             if (responseJson.results[0].original_language === "en"){
                 otherVars.imageUrlSuffix[String(responseJson.results[0].original_title)] = responseJson.results[0].poster_path
-                fetchInfoOmbd(responseJson.results[0].original_title, omdbSearchUrl)
+                fetchInfoOmbd(responseJson.results[0].original_title, store.constants.omdbSearchUrl)
             }
             else{
                 otherVars.imageUrlSuffix[String(responseJson.results[0].title)] = responseJson.results[0].poster_path
-                fetchInfoOmbd(responseJson.results[0].title, omdbSearchUrl)
+                fetchInfoOmbd(responseJson.results[0].title, store.constants.omdbSearchUrl)
             }
         }
         else{
             if (responseJson.results[0].original_language === "en"){
                 otherVars.imageUrlSuffix[String(responseJson.results[0].original_name)] = responseJson.results[0].poster_path
-                fetchInfoOmbd(responseJson.results[0].original_name, omdbSearchUrl)
+                fetchInfoOmbd(responseJson.results[0].original_name, store.constants.omdbSearchUrl)
             }
             else{
                 otherVars.imageUrlSuffix[String(responseJson.results[0].name)] = responseJson.results[0].poster_path
-                fetchInfoOmbd(responseJson.results[0].name, omdbSearchUrl)
+                fetchInfoOmbd(responseJson.results[0].name, store.constants.omdbSearchUrl)
             }
         }
     }
@@ -208,21 +212,21 @@ function saveImagePath(responseJson){
         if (responseJson.results[0].media_type == 'movie'){
             if (responseJson.results[0].original_language === "en"){
                 otherVars.imageUrlSuffix[String(responseJson.results[0].original_title)] = responseJson.results[0].backdrop_path
-                fetchInfoOmbd(responseJson.results[0].original_title, omdbSearchUrl)
+                fetchInfoOmbd(responseJson.results[0].original_title, store.constants.omdbSearchUrl)
             }
             else{
                 otherVars.imageUrlSuffix[String(responseJson.results[0].title)] = responseJson.results[0].backdrop_path
-                fetchInfoOmbd(responseJson.results[0].title, omdbSearchUrl)
+                fetchInfoOmbd(responseJson.results[0].title, store.constants.omdbSearchUrl)
             }
         }
         else{
             if (responseJson.results[0].original_language === "en"){
                 otherVars.imageUrlSuffix[String(responseJson.results[0].original_name)] = responseJson.results[0].backdrop_path
-                fetchInfoOmbd(responseJson.results[0].original_name, omdbSearchUrl)
+                fetchInfoOmbd(responseJson.results[0].original_name, store.constants.omdbSearchUrl)
             }
             else{
                 otherVars.imageUrlSuffix[String(responseJson.results[0].name)] = responseJson.results[0].backdrop_path
-                fetchInfoOmbd(responseJson.results[0].name, omdbSearchUrl)
+                fetchInfoOmbd(responseJson.results[0].name, store.constants.omdbSearchUrl)
             }
         }
     }
@@ -246,14 +250,14 @@ function fetchInfoTMBD(items,searchUrl) {
         .then(response => response.json())
         .then(responseJson => 
             saveImagePath(responseJson))
-        .catch(error => console.log("Couldn't find "+ items[i] + " in database"))
+        .catch(error => alert("Sorry! Couldn't find "+ items[i] + " in database"))
     }
 }
 
 function testIfMatching(responseJson){
     if (responseJson[String(otherVars.searchCategory)].toLowerCase().includes(otherVars.searchQuery.toLowerCase())){
         var items = [responseJson.Title]
-        fetchInfoTMBD(items, movieSearchUrl)
+        fetchInfoTMBD(items, store.constants.movieSearchUrl)
     }
 }
 
@@ -267,7 +271,7 @@ function fetchSearchResults(searchUrl){
         .then(response => response.json())
         .then(responseJson => 
             testIfMatching(responseJson))
-        .catch(error => console.log("Couldn't find something in database"))
+        .catch(error => alert("Sorry! Couldn't find something in database"))
     }
 }
  
@@ -278,47 +282,51 @@ function saveYouTubeId(responseJson){
     if (queryParams.youTube.q === "Gypsy Netflix official trailer"){
         title = [queryParams.youTube.q.replace(" Netflix official trailer", '')]
     }
-    fetchInfoTMBD(title, movieSearchUrl)
+    fetchInfoOmbd(title, store.constants.omdbSearchUrl)
 }
 
 
 function fetchInfoYouTube(title,searchUrl) {
-    correction = checkForCorrections(title,"youTube")
+    var correction = checkForCorrections(title,"youTube")
+    var backupTitle = [title]
     if (correction === undefined){
         queryParams.youTube.q = title + " official trailer"
     }   
     else{
         queryParams.youTube.q = correction + " official trailer"
-    }
+    }  
     var queryString = formatQueryParams(queryParams.youTube)
     var url = searchUrl + queryString
     fetch(url)
     .then(response => response.json())
     .then(responseJson => 
         saveYouTubeId(responseJson))
-    .catch(error => console.log("couldn't find", title))
+    .catch(error => fetchInfoOmbd(backupTitle, store.constants.omdbSearchUrl)) 
 }
+
 
  //-----LG store-----//
 
 function findTitleInStore(title){
-    otherVars.titlesToSearch = [] 
+    let titlesToSearch = [] 
     for (var i=0; i < store.media.length; i++){
         if (store.media[i].title.toLowerCase().includes(title.toLowerCase())){
-            otherVars.titlesToSearch.push(store.media[i])
+           titlesToSearch.push(store.media[i])
         }
     }
+    return titlesToSearch
 }
 
 //----------Loading Browse Window Functions----------//
 
 function loadBrowse(){
+    otherVars.browseArrayItems = []
     $('ul.results-list').empty()
     $('.results').removeClass('hidden')
     for (var i = 0; i < 10; i++){
-        browseArrayItems.push(browseArrayNotDisplayed.splice(Math.random()*(browseArrayNotDisplayed.length-1),1).pop())
+        otherVars.browseArrayItems.push(otherVars.browseArrayNotDisplayed.splice(Math.random()*(otherVars.browseArrayNotDisplayed.length-1),1).pop())
     }
-    fetchInfoTMBD(browseArrayItems,movieSearchUrl)
+    fetchInfoTMBD(otherVars.browseArrayItems,store.constants.movieSearchUrl)
 }
 
 
@@ -328,21 +336,47 @@ function handleSearchClick(){
     $('#search-form').submit(event => {
         event.preventDefault()
         otherVars.loadIndvPage = false
+        $(".js-back-search").addClass("hidden")
         $('ul.results-list').empty()
         $('div.js-indv-page').empty()
+        $(".landing").addClass("hidden")
         $('.results').removeClass('hidden')
         otherVars.searchQuery = $(event.currentTarget).find('#search-bar').val()
         otherVars.searchCategory = $(event.currentTarget).find('#search-category').val()
-        fetchSearchResults(omdbSearchUrl)
+        fetchSearchResults(store.constants.omdbSearchUrl)
     })
 }
 
 function handleTitleClick(title){
     $('ul.results-list').empty()
     title = title.replace("*", "\'")
-    findTitleInStore(title)
-    fetchInfoYouTube(otherVars.titlesToSearch[0].title, youTubeInfoSearchUrl)
     otherVars.loadIndvPage = true
+    $(".landing").addClass("hidden")
+    $(".js-back-search").removeClass("hidden")
+    let titleInfo = findTitleInStore(title)
+    otherVars.youTubeID = ''
+    if (titleInfo[0].youTubeID === undefined){
+        fetchInfoYouTube(titleInfo[0].title, store.constants.youTubeInfoSearchUrl)
+    }
+    else{
+        otherVars.youTubeID = titleInfo[0].youTubeID
+        fetchInfoOmbd(title, store.constants.omdbSearchUrl)
+    }
+}
+
+function handleBackToSearchClick(){
+    $('main').on('click','.js-back-search', event=> {
+        $('div.js-indv-page').empty()
+        otherVars.loadIndvPage = false
+        $(".js-back-search").addClass("hidden")
+        $('.results').removeClass('hidden')
+        if (otherVars.searchCategory === ''){
+            fetchInfoTMBD(otherVars.browseArrayItems,store.constants.movieSearchUrl)
+        }
+        else{
+            fetchSearchResults(store.constants.omdbSearchUrl)
+        }
+    })
 }
 
 
@@ -351,6 +385,7 @@ function handleTitleClick(title){
 function callbackFun(){
     loadBrowse()
     handleSearchClick()
+    handleBackToSearchClick()
 }
   
 $(callbackFun)
